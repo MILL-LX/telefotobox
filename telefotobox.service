@@ -1,5 +1,5 @@
 [Unit]
-Description=fablabedp-kiosk
+Description=telefotobox
 Wants=graphical.target
 After=graphical.target
 After=network.service
