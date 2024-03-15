@@ -20,10 +20,11 @@ $(function () {
 
    socket.on('description', (description) => {
       console.log(description);
+      speechSynthesis.speak(new SpeechSynthesisUtterance(description));
    });
 
 });
 
 setInterval(() => {
-   socket.emit('next');
+ socket.emit('next');
 }, 3000);
