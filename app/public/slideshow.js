@@ -18,9 +18,12 @@ $(function () {
       }
    });
 
+   socket.on('description', (description) => {
+      console.log(description);
+   });
+
 });
 
 setInterval(() => {
-   console.log('next foto please');
    socket.emit('next');
 }, 3000);

@@ -4,6 +4,7 @@ const fs = require('fs');
 const express = require('express');
 const dotenv = require('dotenv');
 const socketIO = require('socket.io');
+const ExifReader = require('exifreader');
 
 dotenv.config();
 
@@ -39,6 +40,9 @@ cp_socket.on('connection', (socket) => {
       if(file_list.length > 0) {
          let i = getRandomInt(file_list.length);
          socket.emit('update', file_list[i]);
+
+         readExif(media + file_list[i]);
+
          file_list.splice(i, 1);
          if(file_list.length == 0) {
             updateFileList();
@@ -66,4 +70,12 @@ function updateFileList() {
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
+}
+
+
+async function readExif(file) {
+   const tags = await ExifReader.load(file);
+   let descriptions = Object.values(JSON.parse(tags.UserComment.description));
+   let i = getRandomInt(descriptions.length);
+   cp_socket.emit('description', descriptions[i]);
 }
