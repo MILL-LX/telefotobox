@@ -1,0 +1,21 @@
+[Unit]
+Description=fablabedp-kiosk
+Wants=graphical.target
+After=graphical.target
+After=network.service
+After=network-online.target
+Requires=fablabedp-virtualcam.service
+
+
+[Service]
+Environment=DISPLAY=:0.0
+Environment=XAUTHORITY=/home/pi/.Xauthority
+Type=idle
+ExecStart=/bin/bash /home/pi/telefotobox/start_telefotobox.sh
+WorkingDirectory=/home/pi/telefotobox/app/
+Restart=always
+User=pi
+Group=pi
+
+[Install]
+WantedBy=graphical.target
