@@ -4,7 +4,6 @@ Wants=graphical.target
 After=graphical.target
 After=network.service
 After=network-online.target
-Requires=fablabedp-virtualcam.service
 
 
 [Service]
