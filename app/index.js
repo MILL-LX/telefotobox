@@ -3,14 +3,43 @@
 const fs = require('fs');
 const express = require('express');
 const dotenv = require('dotenv');
+
+// for comminicating with browser client
 const socketIO = require('socket.io');
+
+// for reading foto metadata
 const ExifReader = require('exifreader');
 
+// for launching and comminicating with rotary decoder python script
+const exec = require('child_process').exec;
+const socket_py = require('socket.py');
+
+// load any environment variables from our .env file
 dotenv.config();
+
+// launch rotary decoder python script
+exec('/usr/bin/python /home/pi/telefotobox/py_rotary_socket.py');
+
+
+// python socket connection ------------------------------------------------ //
+
+socket_py.on('channel_1', (data) => {
+   console.log('[py_rotary_socket.py] ', data);
+   if (!isNaN(data)) {
+      let new_year = parseInt(data);
+      if(new_year >= process.env.MIN_YEAR && < process.env.MAX_YEAR) {
+         goToYear(new_year);
+      } else {
+         console.log("no media for year", new_year);
+      }
+   }
+});
+
+
+// slideshow web server ---------------------------------------------------- //
 
 const port = process.env.PORT || '8000';
 const media = process.env.MEDIA_PATH;
-
 console.log('loading media from '+ media);
 
 const app = express();
@@ -19,6 +48,9 @@ app.get('/', function (req, res){
    res.sendFile(__dirname + '/public/index.html');
 });
 app.use("/media/", express.static(process.env.MEDIA_PATH));
+
+
+// slideshow socket connection --------------------------------------------- //
 
 const cp_server = app.listen(port, () => console.log('slideshow available at port ' + port));
 const cp_socket = socketIO(cp_server);
@@ -31,9 +63,7 @@ cp_socket.on('connection', (socket) => {
    // });
 
    socket.on('year', (new_year) => {
-      year = new_year;
-      console.log('going to year ', year);
-      updateFileList();
+      goToYear(new_year);
    });
 
    socket.on('next', () => {
@@ -54,8 +84,17 @@ cp_socket.on('connection', (socket) => {
 
 });
 
+
+// slideshow control ------------------------------------------------------- //
+
 let file_list = [];
 let year = null;
+
+function goToYear(new_year) {
+   year = new_year;
+   console.log('going to year ', year);
+   updateFileList();
+}
 
 function updateFileList() {
    if(year != null) {
@@ -68,14 +107,16 @@ function updateFileList() {
    }
 }
 
-function getRandomInt(max) {
-  return Math.floor(Math.random() * max);
-}
-
-
 async function readExif(file) {
    const tags = await ExifReader.load(file);
    let descriptions = Object.values(JSON.parse(tags.UserComment.description));
    let i = getRandomInt(descriptions.length);
    cp_socket.emit('description', descriptions[i]);
+}
+
+
+// utilities --------------------------------------------------------------- //
+
+function getRandomInt(max) {
+   return Math.floor(Math.random() * max);
 }
