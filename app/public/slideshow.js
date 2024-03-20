@@ -17,4 +17,8 @@ $(function () {
       }
    });
 
+   socket.on('noise', () => {
+      $('#foto').attr('src',noise);
+   });
+
 });

@@ -50,13 +50,19 @@ socket.on('connection', (socket) => {
       socket.emit('howdy');
    });
 
-   socket.on('dailer_ready', () => {
-      console.log('dailer is ready');
-      socket.emit('update', 'noise.gif');
+   socket.on('dialer_ready', () => {
+      console.log('dialer is ready');
+      socket.emit('noise');
    });
 
    socket.on('hook', (hook_status) => {
       console.log('hook status:', hook_status);
+      if(hook_status == 1) {
+         clearInterval(foto_timer);
+         socket.emit('noise');
+      } else {
+         
+      }
    });
 
    socket.on('year', (new_year) => {
