@@ -61,7 +61,8 @@ io.on('connection', (socket) => {
          clearInterval(foto_timer);
          io.emit('noise');
       } else {
-
+         exec('cvlc dailtone.mp3 -A alsa');
+         exec('spd-say "welcome to the tele photo box. please dial the year you would like to travel to"');
       }
    });
 
