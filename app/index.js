@@ -3,7 +3,9 @@
 const fs = require('fs');
 const express = require('express');
 const dotenv = require('dotenv');
-const exec = require('child_process').exec;
+// const exec = require('child_process').exec;
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
 
 // for comminicating with browser client
 const socketIO = require('socket.io');
@@ -61,8 +63,7 @@ io.on('connection', (socket) => {
          clearInterval(foto_timer);
          io.emit('noise');
       } else {
-         exec('cvlc dailtone.mp3 -A alsa');
-         exec('spd-say "welcome to the tele photo box. please dial the year you would like to travel to"');
+         welcomeMessage();
       }
    });
 
@@ -88,6 +89,11 @@ io.on('connection', (socket) => {
 let file_list = [];
 let year = null;
 let foto_timer;
+
+async function welcomeMessage() {
+   await exec('cvlc dialtone.mp3 -A alsa --play-and-exit');
+   exec('spd-say "welcome to the MILL tele photo slideshow machine. please dial the year you would like to travel to"');
+}
 
 function goToYear(new_year) {
    year = new_year;

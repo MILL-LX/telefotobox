@@ -2,23 +2,26 @@
 
 let socket = io();
 
-let noise = "noise.gif"
-
 window.onload = () => {
+   $('#noise').hide();
 };
 
 $(function () {
 
    socket.on('update', (foto) => {
       if(foto != null) {
+         $('#noise').hide();
+         $('#foto').show();
          $('#foto').attr('src','media/' + foto);
       } else {
-         $('#foto').attr('src',noise);
+         $('#foto').hide();
+         $('#noise').show();
       }
    });
 
    socket.on('noise', () => {
-      $('#foto').attr('src',noise);
+      $('#foto').hide();
+      $('#noise').show();
    });
 
 });
