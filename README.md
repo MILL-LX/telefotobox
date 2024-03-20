@@ -6,8 +6,8 @@
 
 rename `.env.sample` to `.env` and edit as needed
 
-`python3 -m venv dailer-venv`
-`pip install -r dailer-requirements.txt
+`python3 -m venv dialer-venv`
+`pip install -r dialer-requirements.txt
 
 
 

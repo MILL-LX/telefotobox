@@ -19,8 +19,9 @@ SERVER = 'http://localhost:8000'
 
 @sio.event
 def connect():
-    sio.emit('dailer_ready')
     print('connection established')
+    time.sleep(3)
+    sio.emit('dialer_ready')
 
 @sio.event
 def disconnect():
@@ -124,8 +125,8 @@ def set_callbacks():
 def hook_detect(self, event, tick):
     global hook_status
     global pi
-    print('hook_detect()')
     hook_status = pi.read(pin_hook)
+    print('hook_detect()', hook_status)
     sio.emit('hook', hook_status)
 
 
