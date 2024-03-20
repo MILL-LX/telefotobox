@@ -41,9 +41,9 @@ const server = app.listen(port, () => console.log('slideshow available at port '
 // socket connections
 // ------------------------------------------------------------------------- //
 
-const socket = socketIO(server);
+const io = socketIO(server);
 
-socket.on('connection', (socket) => {
+io.on('connection', (socket) => {
    console.log('client connected');
 
    socket.on('hello', () => {
@@ -52,16 +52,16 @@ socket.on('connection', (socket) => {
 
    socket.on('dialer_ready', () => {
       console.log('dialer is ready');
-      socket.emit('noise');
+      io.emit('noise');
    });
 
    socket.on('hook', (hook_status) => {
       console.log('hook status:', hook_status);
       if(hook_status == 1) {
          clearInterval(foto_timer);
-         socket.emit('noise');
+         io.emit('noise');
       } else {
-         
+
       }
    });
 
@@ -100,7 +100,7 @@ function goToYear(new_year) {
 function nextFoto() {
    if(file_list.length > 0) {
       let i = getRandomInt(file_list.length);
-      socket.emit('update', file_list[i]);
+      io.emit('update', file_list[i]);
       readExif(media + file_list[i]);
       file_list.splice(i, 1);
       if(file_list.length == 0) {
@@ -126,7 +126,7 @@ async function readExif(file) {
    const tags = await ExifReader.load(file);
    let descriptions = Object.values(JSON.parse(tags.UserComment.description));
    let i = getRandomInt(descriptions.length);
-   socket.emit('description', descriptions[i]);
+   io.emit('description', descriptions[i]);
 }
 
 
