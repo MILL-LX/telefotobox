@@ -52,8 +52,16 @@ socket.on('connection', (socket) => {
    console.log('client connected');
 
    socket.on('hello', () => {
-      console.log('howdy');
       socket.emit('howdy');
+   });
+
+   socket.on('dailer_ready', () => {
+      console.log('dailer is ready');
+      socket.emit('update', 'noise.gif';
+   });
+
+   socket.on('hook', (hook_status) => {
+      console.log('hook status:', hook_status);
    });
 
    socket.on('year', (new_year) => {

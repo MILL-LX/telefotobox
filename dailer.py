@@ -19,6 +19,7 @@ SERVER = 'http://localhost:8000'
 
 @sio.event
 def connect():
+    sio.emit('dailer_ready')
     print('connection established')
 
 @sio.event
@@ -34,13 +35,14 @@ def disconnect():
 pin_dial_counter = 17       # Count the dialed number (pin 11)
 pin_dial_detect = 22        # Detect number dialing (pin 13)
 
+pin_hook = 10               # Detect number dialing (pin 13)
+
 # ------------------------------------------------------------------------------
 # Global variables, flags and counters
 # ------------------------------------------------------------------------------
 
 cb_dialer_handler = 0       # Callback handler for the rotary dialer
 cb_counter_handler = 0      # Callback handler for the rotary pulse counter
-
 
 # Initially set to false it is True when the user start dialing a number with the
 # rotary dialer. The status remain True until the rotary dialer has not completed the
@@ -64,24 +66,14 @@ dialed_number = ''
 # command code is sufficient for 999 different commands, maybe sufficient!
 max_numbers = 4
 
-# print('estamos cá dentro')
-
 # PiGPIO library instance, globally defined
 pi = pigpio.pi()
 
 print("get_hardware_revision() => ", pi.get_hardware_revision())
 
-# pi.set_noise_filter(17, 42, 5)
 pi.set_glitch_filter(pin_dial_detect, 250)
-
 pi.set_glitch_filter(pin_dial_counter, 100)
-
-
-# socket = NodeSocket.NodeSocket()
-# channel = 'channel_1'
-# socket.write(channel, 'Hello from Python, said the socket!')
-# print('socket open');
-# response = socket.get(channel)
+pi.set_glitch_filter(pin_hook, 250)
 
 
 def initGPIO():
@@ -101,6 +93,8 @@ def initGPIO():
     pi.set_pull_up_down(pin_dial_counter, pigpio.PUD_DOWN)
     pi.set_mode(pin_dial_detect, pigpio.INPUT)
     pi.set_pull_up_down(pin_dial_detect, pigpio.PUD_DOWN)
+    pi.set_mode(pin_hook, pigpio.INPUT)
+    pi.set_pull_up_down(pin_hook, pigpio.PUD_DOWN)
 
     # Set the callback for the interested pins and gets the handlers
     set_callbacks()
@@ -120,9 +114,19 @@ def set_callbacks():
     print('set_callbacks()')
 
     cb_dialer_handler = pi.callback(
+        pin_hook, pigpio.EITHER_EDGE, hook_detect)
+    cb_dialer_handler = pi.callback(
         pin_dial_detect, pigpio.EITHER_EDGE, dial_detect)
     cb_counter_handler = pi.callback(
         pin_dial_counter, pigpio.EITHER_EDGE, pulse_count)
+
+
+def hook_detect(self, event, tick):
+    global hook_status
+    global pi
+    print('hook_detect()')
+    hook_status = pi.read(pin_hook)
+    sio.emit('hook', hook_status)
 
 
 def dial_detect(self, event, tick):
