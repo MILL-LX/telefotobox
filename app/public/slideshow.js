@@ -5,7 +5,6 @@ let socket = io();
 let noise = "noise.gif"
 
 window.onload = () => {
-   socket.emit('year', 2020);
 };
 
 $(function () {
@@ -18,13 +17,4 @@ $(function () {
       }
    });
 
-   socket.on('description', (description) => {
-      console.log(description);
-      speechSynthesis.speak(new SpeechSynthesisUtterance(description));
-   });
-
 });
-
-setInterval(() => {
- socket.emit('next');
-}, 3000);

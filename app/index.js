@@ -11,17 +11,12 @@ const socketIO = require('socket.io');
 // for reading foto metadata
 const ExifReader = require('exifreader');
 
-// for detecting telephone hook state
-// const let gpio = require('onoff').Gpio;
-
 // load any environment variables from our .env file
 dotenv.config();
 
-// launch rotary decoder python script
-// exec('/usr/bin/python3 /home/pi/telefotobox/py_rotary_socket.py');
-
 const min_year = process.env.MIN_YEAR || '2019';
 const max_year = process.env.MAX_YEAR || '2023';
+const foto_delay = process.env.FOTO_DELAY || '3000';
 
 
 // ------------------------------------------------------------------------- //
@@ -57,7 +52,7 @@ socket.on('connection', (socket) => {
 
    socket.on('dailer_ready', () => {
       console.log('dailer is ready');
-      socket.emit('update', 'noise.gif';
+      socket.emit('update', 'noise.gif');
    });
 
    socket.on('hook', (hook_status) => {
@@ -73,19 +68,7 @@ socket.on('connection', (socket) => {
    });
 
    socket.on('next', () => {
-      if(file_list.length > 0) {
-         let i = getRandomInt(file_list.length);
-         socket.emit('update', file_list[i]);
-
-         readExif(media + file_list[i]);
-
-         file_list.splice(i, 1);
-         if(file_list.length == 0) {
-            updateFileList();
-         }
-      } else {
-         console.log('no fotos found');
-      }
+      nextFoto();
    });
 
 });
@@ -97,11 +80,29 @@ socket.on('connection', (socket) => {
 
 let file_list = [];
 let year = null;
+let foto_timer;
 
 function goToYear(new_year) {
    year = new_year;
    console.log('going to year ', year);
    updateFileList();
+   clearInterval(foto_timer);
+   nextFoto();
+   foto_timer = setInterval(nextFoto, foto_delay);
+}
+
+function nextFoto() {
+   if(file_list.length > 0) {
+      let i = getRandomInt(file_list.length);
+      socket.emit('update', file_list[i]);
+      readExif(media + file_list[i]);
+      file_list.splice(i, 1);
+      if(file_list.length == 0) {
+         updateFileList();
+      }
+   } else {
+      console.log('no fotos found');
+   }
 }
 
 function updateFileList() {
