@@ -5,7 +5,7 @@ let socket = io();
 let noise = "noise.gif"
 
 window.onload = () => {
-   socket.emit('year', 2019);
+   socket.emit('year', 2020);
 };
 
 $(function () {

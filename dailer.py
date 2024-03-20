@@ -1,13 +1,29 @@
-#! /usr/bin/env python3
-
-from NodeSocket import NodeSocket
 import time
 import pigpio
 import subprocess
 import json
+import socketio
+
+# ------------------------------------------------------------------------------
 
 PI_HIGH = 1
 PI_LOW = 0
+
+# ------------------------------------------------------------------------------
+# setup socket connection to nodejs server
+# ------------------------------------------------------------------------------
+
+sio = socketio.Client()
+
+SERVER = 'http://localhost:8000'
+
+@sio.event
+def connect():
+    print('connection established')
+
+@sio.event
+def disconnect():
+    print('disconnected from server')
 
 # ------------------------------------------------------------------------------
 # Pin assignment. Note that the pin numbers should be those mentioned in the
@@ -16,7 +32,7 @@ PI_LOW = 0
 # number.
 # ------------------------------------------------------------------------------
 pin_dial_counter = 17       # Count the dialed number (pin 11)
-pin_dial_detect = 27        # Detect number dialing (pin 13)
+pin_dial_detect = 22        # Detect number dialing (pin 13)
 
 # ------------------------------------------------------------------------------
 # Global variables, flags and counters
@@ -46,7 +62,7 @@ dialed_number = ''
 # Maximum number of characters of the dialed number.
 # This depends on the numeric commands structures decided by the program. A three-number
 # command code is sufficient for 999 different commands, maybe sufficient!
-max_numbers = 3
+max_numbers = 4
 
 # print('estamos cá dentro')
 
@@ -61,10 +77,11 @@ pi.set_glitch_filter(pin_dial_detect, 250)
 pi.set_glitch_filter(pin_dial_counter, 100)
 
 
-socket = NodeSocket.NodeSocket()
-channel = 'channel_1'
-socket.write(channel, 'Hello from Python, said the socket!')
-response = socket.get(channel)
+# socket = NodeSocket.NodeSocket()
+# channel = 'channel_1'
+# socket.write(channel, 'Hello from Python, said the socket!')
+# print('socket open');
+# response = socket.get(channel)
 
 
 def initGPIO():
@@ -189,10 +206,7 @@ def check_number():
     if dialed_number != '':
         if len(dialed_number) >= max_numbers:
 
-            socket.write(channel, dialed_number)
-            response = socket.get(channel)
-            print("socket response = ", response)
-
+            sio.emit('year', dialed_number)
 
             if int(dialed_number) == 666:
                 # Restart the appplication to initial conditions
@@ -212,7 +226,11 @@ def reinit():
 
 if __name__ == '__main__':
     # Main application
+
     initGPIO()
+
+    sio.connect(SERVER)
+    sio.wait()
 
     # looping infinitely
     while True:

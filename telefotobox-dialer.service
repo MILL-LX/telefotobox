@@ -1,0 +1,13 @@
+[Unit]
+Description=telefotobox-dialer
+After=network.target
+Requires=telefotobox.service
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/telefotobox/
+ExecStart=/bin/bash /home/pi/telefotobox/start_telefotobox-dialer.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
