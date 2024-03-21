@@ -3,7 +3,6 @@
 const fs = require('fs');
 const express = require('express');
 const dotenv = require('dotenv');
-// const exec = require('child_process').exec;
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
@@ -18,7 +17,11 @@ dotenv.config();
 
 const min_year = process.env.MIN_YEAR || '2019';
 const max_year = process.env.MAX_YEAR || '2023';
-const foto_delay = process.env.FOTO_DELAY || '3000';
+const foto_delay = process.env.FOTO_DELAY || '10000';
+
+console.log('min_year =', min_year);
+console.log('max_year =', max_year);
+console.log('foto_delay =', foto_delay);
 
 
 // ------------------------------------------------------------------------- //
@@ -90,10 +93,6 @@ let file_list = [];
 let year = null;
 let foto_timer;
 
-async function welcomeMessage() {
-   await exec('cvlc dialtone.mp3 -A alsa --play-and-exit');
-   exec('spd-say "welcome to the MILL tele photo slideshow machine. please dial the year you would like to travel to"');
-}
 
 function goToYear(new_year) {
    year = new_year;
@@ -132,8 +131,22 @@ function updateFileList() {
 async function readExif(file) {
    const tags = await ExifReader.load(file);
    let descriptions = Object.values(JSON.parse(tags.UserComment.description));
-   let i = getRandomInt(descriptions.length);
-   io.emit('description', descriptions[i]);
+   //let i = getRandomInt(descriptions.length);
+   //io.emit('description', descriptions[i]);
+   
+   for (let i = descriptions.length-1; i >= 0; i--) {
+      descriptions[i] = descriptions[i].replace(/[\\$'"]/g, "\\$&")
+   }
+   //exec('spd-say "' + descriptions[i] + '"');
+   //console.log(descriptions);
+   await exec('spd-say -w "' + descriptions[0] + '"');
+   await exec('spd-say -w "' + descriptions[1] + '"');
+   await exec('spd-say -w "' + descriptions[2] + '"');
+}
+
+async function welcomeMessage() {
+   await exec('cvlc dialtone.mp3 -A alsa --play-and-exit');
+   exec('spd-say "welcome to the MILL tele photo slideshow machine. please dial the year you would like to travel to"');
 }
 
 
