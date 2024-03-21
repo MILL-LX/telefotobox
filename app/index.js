@@ -23,6 +23,9 @@ console.log('min_year =', min_year);
 console.log('max_year =', max_year);
 console.log('foto_delay =', foto_delay);
 
+// 1 = phone on hook
+// 0 = phone off hook
+let hook_status = 1;
 
 // ------------------------------------------------------------------------- //
 // web server 
@@ -60,18 +63,29 @@ io.on('connection', (socket) => {
       io.emit('noise');
    });
 
-   socket.on('hook', (hook_status) => {
+   socket.on('hook', (new_hook_status) => {
+      hook_status = new_hook_status;
       console.log('hook status:', hook_status);
       if(hook_status == 1) {
          clearInterval(foto_timer);
          io.emit('noise');
+         killSpeech();
       } else {
          welcomeMessage();
       }
    });
 
    socket.on('year', (new_year) => {
-      goToYear(new_year);
+      if(hook_status == 0) {
+         io.emit('msg', new_year);
+         killSpeech();
+         setTimeout(()=>{
+            goToYear(new_year);
+         }, 500);
+      } else {
+         io.emit('sorry, phone is on the hook');
+         console.log('cant go to', new_year, ', phone on hook');
+      }
    });
 
    socket.on('next', () => {
@@ -91,7 +105,6 @@ let foto_timer = null;
 
 async function goToYear(new_year) {
 
-   io.emit('msg', new_year);
    await exec('spd-say -w "going to the year' + new_year + '"');
 
    if(new_year >= min_year && new_year < max_year) {
@@ -100,10 +113,8 @@ async function goToYear(new_year) {
       console.log('going to year ', year);
       updateFileList();
       clearInterval(foto_timer);
-      setTimeout(()=>{
-         nextFoto();
-         foto_timer = setInterval(nextFoto, foto_delay);
-      }, 2000);
+      nextFoto();
+      foto_timer = setInterval(nextFoto, foto_delay);
       
    } else {
 
@@ -162,7 +173,15 @@ async function readExif(file) {
 
 async function welcomeMessage() {
    await exec('cvlc dialtone.mp3 -A alsa --play-and-exit');
-   exec('spd-say "welcome to the MILL tele photo slideshow machine. please dial the year you would like to travel to"');
+   if(hook_status == 0) {
+      exec('spd-say "welcome to the MILL tele photo slideshow machine. please dial the year you would like to travel to"');
+   }
+}
+
+function killSpeech() {
+   // try {
+      exec('sudo pkill -f speech-dispatch',(error) => {});
+   // } catch(err) {}
 }
 
 
