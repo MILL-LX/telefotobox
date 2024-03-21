@@ -32,12 +32,10 @@ html, body {
 }
 
 #msg {
-	display: flex;
-	justify-content: center;
-	text-align: center;
-	align-content: center;
-	flex-direction: column;
-	height: 100vw;
+    position: absolute;
+    top:  50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
 }
 
 #msg h1 {
