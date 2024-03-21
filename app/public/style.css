@@ -1,3 +1,7 @@
+@font-face {
+    font-family: 'screener';
+    src: url('screener_sc.ttf');
+}
 
 html, body {
 	background: #000;
@@ -25,4 +29,20 @@ html, body {
 	max-height: 100vh;
 	width: 100vw;
 	margin-top: 0px;
+}
+
+#msg {
+	display: flex;
+	justify-content: center;
+	text-align: center;
+	align-content: center;
+	flex-direction: column;
+	height: 100vw;
+}
+
+#msg h1 {
+    font-family: screener;
+	font-size: 1000%;
+	color: #FFF;
+	z-index: 999;
 }

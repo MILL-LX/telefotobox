@@ -71,11 +71,7 @@ io.on('connection', (socket) => {
    });
 
    socket.on('year', (new_year) => {
-      if(new_year >= min_year && new_year < max_year) {
-         goToYear(new_year);
-      } else {
-         console.log("no media for year", new_year);
-      }
+      goToYear(new_year);
    });
 
    socket.on('next', () => {
@@ -91,16 +87,36 @@ io.on('connection', (socket) => {
 
 let file_list = [];
 let year = null;
-let foto_timer;
+let foto_timer = null;
 
+async function goToYear(new_year) {
 
-function goToYear(new_year) {
-   year = new_year;
-   console.log('going to year ', year);
-   updateFileList();
-   clearInterval(foto_timer);
-   nextFoto();
-   foto_timer = setInterval(nextFoto, foto_delay);
+   io.emit('msg', new_year);
+   await exec('spd-say -w "going to the year' + new_year + '"');
+
+   if(new_year >= min_year && new_year < max_year) {
+
+      year = new_year;
+      console.log('going to year ', year);
+      updateFileList();
+      clearInterval(foto_timer);
+      setTimeout(()=>{
+         nextFoto();
+         foto_timer = setInterval(nextFoto, foto_delay);
+      }, 2000);
+      
+   } else {
+
+      console.log("no media for year", new_year);
+      io.emit('noise');
+      clearInterval(foto_timer);
+      foto_timer = null;
+      if(new_year < max_year) {
+         exec('spd-say -w "sorry, I don\'t have any photos from' + new_year + '"');
+      } else {
+         exec('spd-say -w "sorry, I don\'t have any photos from the future."');
+      }
+   }
 }
 
 function nextFoto() {
