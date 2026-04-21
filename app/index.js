@@ -108,7 +108,7 @@ async function goToYear(new_year) {
 
    await exec('sudo -i -u pi spd-say -w "going to the year' + new_year + '"');
 
-   if(new_year >= min_year && new_year < max_year) {
+   if(new_year >= min_year && new_year <= max_year) {
 
       year = new_year;
       console.log('going to year ', year);
@@ -126,7 +126,7 @@ async function goToYear(new_year) {
       if(new_year < max_year) {
          exec('sudo -i -u pi spd-say -w "sorry, I don\'t have any photos from' + new_year + '"');
       } else {
-         exec('sudo -i -u pi spd-say -w "sorry, I don\'t have any photos from the future."');
+         exec('sudo -i -u pi spd-say -w "' + new_year + ' is in the future. sorry, I don\'t have any photos from the future."');
       }
    }
 }
@@ -158,7 +158,7 @@ function updateFileList() {
 
 async function readExif(file) {
    const tags = await ExifReader.load(file);
-   let descriptions = Object.values(JSON.parse(tags.UserComment.description));
+   let descriptions = tags.UserComment && tags.UserComment.description ? Object.values(JSON.parse(tags.UserComment.description)) : new Array('sorry, no description available', undefined, 'computer says no');
    //let i = getRandomInt(descriptions.length);
    //io.emit('description', descriptions[i]);
    
