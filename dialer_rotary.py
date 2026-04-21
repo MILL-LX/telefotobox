@@ -70,11 +70,11 @@ max_numbers = 4
 # PiGPIO library instance, globally defined
 pi = pigpio.pi()
 
-print("get_hardware_revision() => ", pi.get_hardware_revision())
+# print("get_hardware_revision() => ", pi.get_hardware_revision())
 
-pi.set_glitch_filter(pin_dial_detect, 250)
-pi.set_glitch_filter(pin_dial_counter, 100)
-pi.set_glitch_filter(pin_hook, 250)
+# pi.set_glitch_filter(pin_dial_detect, 250)
+# pi.set_glitch_filter(pin_dial_counter, 100)
+# pi.set_glitch_filter(pin_hook, 250)
 
 
 def initGPIO():
@@ -232,7 +232,7 @@ def reinit():
 if __name__ == '__main__':
     # Main application
 
-    initGPIO()
+    # initGPIO()
 
     sio.connect(SERVER)
     sio.wait()

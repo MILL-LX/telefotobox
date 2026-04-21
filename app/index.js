@@ -15,8 +15,8 @@ const ExifReader = require('exifreader');
 // load any environment variables from our .env file
 dotenv.config();
 
-const min_year = process.env.MIN_YEAR || '2019';
-const max_year = process.env.MAX_YEAR || '2023';
+const min_year = process.env.MIN_YEAR || '2014';
+const max_year = process.env.MAX_YEAR || '2026';
 const foto_delay = process.env.FOTO_DELAY || '10000';
 
 console.log('min_year =', min_year);
@@ -76,6 +76,7 @@ io.on('connection', (socket) => {
    });
 
    socket.on('year', (new_year) => {
+      console.log('chosen year: '+ new_year);
       if(hook_status == 0) {
          io.emit('msg', new_year);
          killSpeech();
@@ -105,7 +106,7 @@ let foto_timer = null;
 
 async function goToYear(new_year) {
 
-   await exec('spd-say -w "going to the year' + new_year + '"');
+   await exec('sudo -i -u pi spd-say -w "going to the year' + new_year + '"');
 
    if(new_year >= min_year && new_year < max_year) {
 
@@ -123,9 +124,9 @@ async function goToYear(new_year) {
       clearInterval(foto_timer);
       foto_timer = null;
       if(new_year < max_year) {
-         exec('spd-say -w "sorry, I don\'t have any photos from' + new_year + '"');
+         exec('sudo -i -u pi spd-say -w "sorry, I don\'t have any photos from' + new_year + '"');
       } else {
-         exec('spd-say -w "sorry, I don\'t have any photos from the future."');
+         exec('sudo -i -u pi spd-say -w "sorry, I don\'t have any photos from the future."');
       }
    }
 }
@@ -166,15 +167,15 @@ async function readExif(file) {
    }
    //exec('spd-say "' + descriptions[i] + '"');
    //console.log(descriptions);
-   await exec('spd-say -w "' + descriptions[0] + '"');
-   await exec('spd-say -w "' + descriptions[1] + '"');
-   await exec('spd-say -w "' + descriptions[2] + '"');
+   await exec('sudo -i -u pi spd-say -w "' + descriptions[0] + '"');
+   await exec('sudo -i -u pi spd-say -w "' + descriptions[1] + '"');
+   await exec('sudo -i -u pi spd-say -w "' + descriptions[2] + '"');
 }
 
 async function welcomeMessage() {
-   await exec('cvlc dialtone.mp3 -A alsa --play-and-exit');
+   await exec('sudo -i -u pi cvlc dialtone.mp3 --play-and-exit');
    if(hook_status == 0) {
-      exec('spd-say "welcome to the MILL tele photo slideshow machine. please dial the year you would like to travel to"');
+      exec('sudo -i -u pi spd-say "welcome to the MILL tele photo slideshow machine. please dial the year you would like to travel to"');
    }
 }
 

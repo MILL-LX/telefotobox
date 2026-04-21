@@ -3,44 +3,69 @@
     src: url('screener_sc.ttf');
 }
 
-html, body {
-	background: #000;
+/* No ficheiro CSS da app Telefotobox */
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: black; /* Garante que não há bordas brancas se a imagem for menor */
+    overflow: hidden;
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center;     /* Centra verticalmente */
+}
+
+#foto, img { /* Ajusta para o ID ou classe que o Telefotobox usa */
+    max-width: 100vw;
+    max-height: 100vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;    /* Mantém a proporção original sem cortar */
+    display: block;
+    margin: auto;           /* Reforça o centramento */
+}
+/* 
+html,
+body {
+    background: #000;
     height: 100%;
     margin: 0;
     padding: 0;
-	overflow: hidden;
-}
+    overflow: hidden;
+} */
 
-#foto {
+/* #foto {
     padding: 0;
     display: block;
     margin: 0 auto;
     max-height: 100%;
     max-width: 100%;
-}
+} */
 
-#noise {
-	position: relative;
-	left: 50%;
-	right: 50%;
-	margin-left: -50vw;
-	margin-right: -50vw;
-	max-width: 100vw;
-	max-height: 100vh;
-	width: 100vw;
-	margin-top: 0px;
-}
+/* #noise {
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    max-width: 100vw;
+    max-height: 100vh;
+    width: 100vw;
+    margin-top: 0px;
+} */
 
 #msg {
     position: absolute;
-    top:  50%;
+    top: 50%;
     left: 50%;
-    transform: translate(-50%,-50%);
+    transform: translate(-50%, -50%);
 }
 
 #msg h1 {
     font-family: screener;
-	font-size: 1000%;
-	color: #FFF;
-	z-index: 999;
+    font-size: 1000%;
+    color: #FFF;
+    z-index: 999;
 }
